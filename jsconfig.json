@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "saveUrl": ".",
+    "path": {
+      "#*": ["src/*/"]
+    }
+  },
+  "include": ["src"]
+}
