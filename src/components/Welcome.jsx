@@ -30,6 +30,7 @@ const setupTextHover = (container, type) => {
             duration,
             ease: "power2.out",
             fontVariationSettings: `'wght' ${weight}`,
+            overwrite: "auto",
         });
     }
     const handleMouseMove = (e) => {
@@ -84,7 +85,7 @@ const Welcome = () => {
             {renderText("portfolio", 'text-9xl italic font-bitcount')}
         </h1>
         <div className="small-screen">
-            <p>This Portfolio is for desktop/tabled screen.</p>
+            <p>This Portfolio is for desktop/tablet screen.</p>
         </div>
     </section>;
 
