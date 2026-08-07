@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Georama:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Georama:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Rubik+Pixels&family=Sixtyfour+Convergence&display&family=Jersey+10+Charted&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght@100..900&display&family=Pixelify+Sans:wght@400..700&display&family=Sekuya&display=swap");
 
 @import "tailwindcss";
 
@@ -15,8 +16,14 @@ body {
 
 @theme {
     --font-georama: "Georama", sans-serif;
+    --font-geist: "Geist Pixel", sans-serif;
+    --font-bitcount: "Bitcount Prop Single", system-ui;
+    --font-sekuya: "Sekuya", system-ui;
     --font-roboto: "Roboto Mono", monospace;
     --breakpoint-3xl: 1920px;
+    --font-rubik: "Rubik Pixels", system-ui;
+    --font-jersey: "Jersey 10 Charted", sans-serif;
+    --font-pixel: "Pixelify Sans", sans-serif;
 }
 
 @utility flex-center {
