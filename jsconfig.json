@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "saveUrl": ".",
-    "path": {
+    "paths": {
       "#*": ["src/*/"]
     }
   },

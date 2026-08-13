@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { WINDOW_CONFIG, INITIAL_Z_INDEX } from "#constants/index.js";
 
+//
 const useWindowStore = create(
     immer((set) => ({
         windows: WINDOW_CONFIG,
@@ -36,3 +37,4 @@ const useWindowStore = create(
 );
 
 export default useWindowStore;
+export { INITIAL_Z_INDEX, WINDOW_CONFIG };
