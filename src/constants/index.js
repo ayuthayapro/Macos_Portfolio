@@ -1,3 +1,17 @@
+const projectArticles = [
+    {
+        id: 1,
+        date: "15/08/2026",
+        title: "ELearning",
+        image: "/images/elearning.png",
+        tags: ["JavaScript", "CSS", "Vite", "PostgreSQL", "Node.js"],
+        description: "A full-stack e-learning platform for RUPP students across multiple majors (ITE, IT, Mathematics), featuring role-based dashboards for students, teachers, and admins.",
+        projectLink: "https://frontend-project-practicum-e-learni.vercel.app/",
+        sourceFrontend: "https://github.com/ayuthayapro/Frontend-Project-Practicum-ELearning",
+        sourceBackend: "https://github.com/ayuthayapro/Backend-Project-Practicum-ELearning",
+    },
+];
+
 const navLinks = [
     {
         id: 1,
@@ -213,6 +227,7 @@ export {
     socials,
     photosLinks,
     gallery,
+    projectArticles,
 };
 
 const WORK_LOCATION = {

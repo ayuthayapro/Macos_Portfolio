@@ -136,34 +136,47 @@ body {
             }
         }
 
-        .blog {
-            @apply bg-white p-10 max-w-3xl mx-auto;
+        .project-list {
+            @apply max-h-[65vh] overflow-y-auto p-6 space-y-6 font-roboto;
+        }
 
-            h2 {
-                @apply text-xl font-bold text-pink-600 mb-10;
+        .project-card {
+            .project-card {
+                @apply bg-white border border-gray-200 rounded-xl shadow-sm p-5 text-left;
+
+            .date {
+                @apply text-xs text-gray-400;
             }
 
-            .blog-post {
-                @apply grid grid-cols-12 space-x-5;
+            h3 {
+                @apply text-lg font-bold text-gray-800;
+            }
 
-                img {
-                    @apply size-full rounded-md object-cover;
+            img {
+                @apply w-full rounded-lg object-cover shadow-md;
+            }
+
+            p {
+                @apply text-sm text-gray-600 text-left leading-tight break-words;
+            }
+
+            .tags {
+                @apply flex flex-wrap justify-start gap-2 text-left;
+
+                span {
+                    @apply text-xs px-2 py-1 rounded-full bg-[#00A154]/10 text-[#00A154] font-semibold;
+                }
+            }
+
+            .actions {
+                @apply flex items-center justify-start gap-3 pt-0;
+
+                .view-project {
+                    @apply text-xs font-medium px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors;
                 }
 
-                .content {
-                    @apply col-span-10 space-y-3;
-
-                    p {
-                        @apply text-xs text-gray-500;
-                    }
-
-                    h3 {
-                        @apply font-semibold text-base text-gray-800;
-                    }
-
-                    a {
-                        @apply text-blue-600 text-xs hover:underline flex items-center gap-3;
-                    }
+                .source-code {
+                    @apply text-xs font-medium px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors;
                 }
             }
         }
@@ -400,4 +413,5 @@ body {
             }
         }
     }
+
 }
