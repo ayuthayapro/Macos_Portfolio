@@ -137,19 +137,18 @@ body {
         }
 
         .project-list {
-            @apply max-h-[65vh] overflow-y-auto p-6 space-y-6 font-roboto;
+            @apply max-h-[65vh] overflow-y-auto p-6 space-y-6;
         }
 
         .project-card {
-            .project-card {
-                @apply bg-white border border-gray-200 rounded-xl shadow-sm p-5 text-left;
+            @apply bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-3;
 
             .date {
                 @apply text-xs text-gray-400;
             }
 
             h3 {
-                @apply text-lg font-bold text-gray-800;
+                @apply text-3xl font-bold text-gray-800 text-center;
             }
 
             img {
@@ -157,11 +156,11 @@ body {
             }
 
             p {
-                @apply text-sm text-gray-600 text-left leading-tight break-words;
+                @apply text-sm text-gray-600;
             }
 
             .tags {
-                @apply flex flex-wrap justify-start gap-2 text-left;
+                @apply flex flex-wrap justify-start gap-2;
 
                 span {
                     @apply text-xs px-2 py-1 rounded-full bg-[#00A154]/10 text-[#00A154] font-semibold;
@@ -169,7 +168,7 @@ body {
             }
 
             .actions {
-                @apply flex items-center justify-start gap-3 pt-0;
+                @apply flex items-center justify-start gap-3 pt-2;
 
                 .view-project {
                     @apply text-xs font-medium px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors;
