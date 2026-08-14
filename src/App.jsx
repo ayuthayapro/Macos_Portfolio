@@ -2,8 +2,8 @@ import gsap from "gsap";
 import { Draggable } from "gsap/Draggable";
 gsap.registerPlugin(Draggable);
 
-import { Navbar, Welcome, Dock }  from "#components";
-import { Terminal,  } from "#windows/index.js";
+import { Navbar, Welcome, Dock } from "#components";
+import { Terminal, SafariWindow } from "#windows/index.js";
 
 const App = () => {
     return (
@@ -13,8 +13,8 @@ const App = () => {
             <Dock />
 
             <Terminal />
+            <SafariWindow />
         </main>
-
     );
 };
 
