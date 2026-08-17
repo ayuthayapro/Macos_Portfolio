@@ -26,7 +26,7 @@ const WindowWrapper = (Component, windowKey) => {
             gsap.fromTo(
                 el,
                 { scale: 0.8, opacity: 0, y: 40 },
-                { scale: 1, opacity: 1, y: 0, duration: 0.6 , ease: "power3.out" }
+                { scale: 1, opacity: 1, y: 0, duration: 0.4 , ease: "power3.out" }
             );
         }, [isOpen]);   // ← closes useGSAP properly with `)`
 
@@ -34,7 +34,10 @@ const WindowWrapper = (Component, windowKey) => {
             const el = ref.current;
             if (!el) return;
 
+            const header = el.querySelector("#window-header");
+
             const [instance] = Draggable.create(el, {
+                trigger: header || el,
                 onPress: () => focusWindow(windowKey),
             });
             return () => instance.kill();
