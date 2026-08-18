@@ -25,7 +25,7 @@ const Dock = () => {
                 const center = iconLeft - left + width / 2;
                 const distance = Math.abs(mouseX - center);
 
-                const intensity = Math.exp(-(distance ** 2.5) / 10000);
+                const intensity = Math.exp(-(distance ** 3) / 10000); //dock hover on
 
                 gsap.to(icon, {
                     scale: 1 + 0.25 * intensity,
