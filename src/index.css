@@ -179,11 +179,32 @@ body {
 
         #window-header {
             @apply flex items-center p-0 h-11 select-none text-sm text-gray-400 flex-none bg-transparent border-b-0 border-none;
-            /* Frosted Glass Header Left */
+
             .header-left {
-                @apply w-48 h-full flex items-center px-4 flex-none bg-[#F2F3F5]/99 backdrop-blur-3xl backdrop-saturate-150;
+                @apply w-48 h-full flex items-center px-4 flex-none relative;
+                background: rgba(236, 236, 238, 0.99);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    z-index: 1;
+                    inset: 0;
+                    pointer-events: none;
+                    border-right: 1px solid transparent;
+                    background: linear-gradient(
+                        to bottom,
+                        rgba(255, 255, 255, 0.35),
+                        rgba(255, 255, 255, 0.08)
+                    ) border-box;
+                    mask: linear-gradient(black, black) border-box,
+                          linear-gradient(black, black) padding-box;
+                    mask-composite: subtract;
+                    -webkit-mask-composite: destination-out;
+                }
             }
-            /* Right Header with bottom border */
+
             .header-right {
                 @apply flex-1 h-full flex items-center px-6 bg-white border-b border-gray-100;
                 .breadcrumb {
@@ -197,9 +218,31 @@ body {
 
         .project-body {
             @apply flex flex-1 min-h-0 h-[calc(38rem-45px)] overflow-hidden;
-            /* Frosted Glass Sidebar */
+
             .sidebar {
-                @apply w-48 h-full max-h-full min-h-0 flex-none bg-[#F2F3F5]/99 backdrop-blur-3xl backdrop-saturate-150 flex flex-col p-3 gap-2 overflow-y-auto;
+                @apply w-48 h-full max-h-full min-h-0 flex-none flex flex-col p-3 gap-2 overflow-y-auto relative;
+                background: rgba(236, 236, 238, 0.99);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    z-index: 1;
+                    inset: 0;
+                    pointer-events: none;
+                    border-right: 1px solid transparent;
+                    background: linear-gradient(
+                        to bottom,
+                        rgba(255, 255, 255, 0.35),
+                        rgba(255, 255, 255, 0.08)
+                    ) border-box;
+                    mask: linear-gradient(black, black) border-box,
+                          linear-gradient(black, black) padding-box;
+                    mask-composite: subtract;
+                    -webkit-mask-composite: destination-out;
+                }
+
                 h3 {
                     @apply text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-2 mb-1;
                 }
@@ -277,6 +320,31 @@ body {
         .techstack {
             @apply text-sm font-roboto p-5;
 
+            .header-left {
+                @apply w-48 h-full flex items-center px-4 flex-none relative;
+                background: rgba(236, 236, 238, 0.92);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    z-index: 1;
+                    inset: 0;
+                    pointer-events: none;
+                    border-right: 1px solid transparent;
+                    background: linear-gradient(
+                        to bottom,
+                        rgba(255, 255, 255, 0.35),
+                        rgba(255, 255, 255, 0.08)
+                    ) border-box;
+                    mask: linear-gradient(black, black) border-box,
+                          linear-gradient(black, black) padding-box;
+                    mask-composite: subtract;
+                    -webkit-mask-composite: destination-out;
+                }
+            }
+
             .label {
                 @apply flex items-center ms-10 mt-7;
             }
@@ -311,6 +379,166 @@ body {
                 }
             }
         }
+    }
+
+    /* Tilt Card */
+    .tilt-card-wrapper {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        perspective: 1000px;
+        z-index: 100;
+        pointer-events: none;
+    }
+
+    .tilt-card-interaction-area {
+        width: min(556px, calc(100vw - 16px));
+        height: 336px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 8px;
+        box-sizing: border-box;
+        pointer-events: auto;
+        cursor: grab !important;
+        user-select: none;
+        -webkit-user-select: none;
+        transform-style: preserve-3d;
+    }
+
+    .tilt-card,
+    .tilt-card *,
+    .tilt-card-interaction-area {
+        cursor: grab !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+    }
+
+    .tilt-card {
+        pointer-events: auto;
+        position: relative;
+        width: 100%;
+        max-width: 540px;
+        height: 320px;
+        display: flex;
+        align-items: center;
+        padding: 24px;
+        background-color: #fdfdfd;
+        background-image: url("/images/cardbg.jpg");
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 20px;
+        box-sizing: border-box;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+        will-change: transform, box-shadow;
+    }
+
+    .tilt-card:active,
+    .tilt-card:active *,
+    .tilt-card[data-dragging="true"],
+    .tilt-card[data-dragging="true"] * {
+        cursor: grabbing !important;
+        transition: none;
+    }
+
+    .tilt-card[data-releasing="true"] {
+        transition: transform 0.55s cubic-bezier(0.25, 1.25, 0.5, 1), box-shadow 0.55s ease-out;
+    }
+
+    .tilt-card *,
+    .tilt-card-gloss,
+    .card-media,
+    .card-content,
+    .card-content *,
+    .contact-phone {
+        pointer-events: none;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+    }
+
+    body.is-dragging,
+    body.is-dragging * {
+        cursor: grabbing !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+    }
+
+    .tilt-card-gloss {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        border-radius: inherit;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateZ(40px);
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        transition: opacity 0.2s ease-out;
+        will-change: opacity, background;
+    }
+
+    .card-media {
+        position: relative;
+        z-index: 1;
+        flex: 0 0 40%;
+        transform: translateZ(15px);
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .card-content {
+        position: relative;
+        z-index: 1;
+        flex: 1;
+        padding-left: 20px;
+        transform: translateZ(25px);
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .contact-phone {
+        display: block;
+        width: 100%;
+        max-height: 270px;
+        object-fit: contain;
+        pointer-events: none;
+        transform: rotate(-16deg) translateY(42px);
+        filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.24));
+    }
+
+    .contact-heading {
+        color: #27272a;
+        font-family: var(--font-mona);
+        font-size: 2rem;
+        font-weight: 750;
+        line-height: 1;
+        letter-spacing: -0.04em;
+    }
+
+    .contact-copy {
+        margin-top: 10px;
+        color: #71717a;
+        font-family: var(--font-mona);
+        font-size: 0.95rem;
+        line-height: 1.45;
     }
 
     #contact {
@@ -500,3 +728,5 @@ body {
     }
 
 }
+
+

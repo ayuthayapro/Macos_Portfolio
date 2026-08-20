@@ -3,7 +3,7 @@ import { Draggable } from "gsap/Draggable";
 gsap.registerPlugin(Draggable);
 
 import { Navbar, Welcome, Dock } from "#components";
-import { Terminal, SafariWindow } from "#windows/index.js";
+import { Terminal, SafariWindow, ContactWindow } from "#windows/index.js";
 
 const App = () => {
     return (
@@ -14,6 +14,7 @@ const App = () => {
 
             <Terminal />
             <SafariWindow />
+            <ContactWindow />
         </main>
     );
 };
