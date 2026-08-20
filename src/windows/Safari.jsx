@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { WindowControls } from "#components";
-import { ArrowUpRight, Code2 } from "lucide-react";
+import { ArrowUpRight, Code2, Folder } from "lucide-react";
 import WindowWrapper from "#hoc/WindowWrapper.jsx";
 import { projectArticles } from "#constants/index.js";
 
@@ -14,6 +14,28 @@ const Safari = () => {
         : Array.isArray(selectedProject.images)
             ? selectedProject.images
             : [selectedProject.image || selectedProject.images].filter(Boolean);
+
+    const handleButtonMouseMove = (e) => {
+        const button = e.currentTarget;
+        const rect = button.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const offsetX = x - rect.width / 2;
+        const offsetY = y - rect.height / 2;
+        const shadowX = -offsetX / 4;
+        const shadowY = -offsetY / 4;
+
+        button.style.boxShadow = `
+        inset 0 2px 2px rgba(255, 255, 255, 0.5),
+        inset 0 -2px 2px rgba(0, 0, 0, 0.25),
+        ${shadowX}px ${shadowY}px 24px rgba(0, 0, 0, 0.35),
+        ${shadowX / 2}px ${shadowY / 2}px 12px rgba(0, 0, 0, 0.25)
+    `;
+    };
+
+    const handleButtonMouseLeave = (e) => {
+        e.currentTarget.style.boxShadow = "";
+    };
 
     return (
         <>
@@ -45,7 +67,8 @@ const Safari = () => {
                                 className={project.id === selectedId ? "active" : "not-active"}
                                 onClick={() => setSelectedId(project.id)}
                             >
-                                {project.title}
+                                <Folder size={14} className={project.id === selectedId ? "text-gray-800" : "text-gray-400"} />
+                                <span>{project.title}</span>
                             </li>
                         ))}
                     </ul>
@@ -102,6 +125,8 @@ const Safari = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="styled__button view-project"
+                            onMouseMove={handleButtonMouseMove}
+                            onMouseLeave={handleButtonMouseLeave}
                         >
                             <span>View Project</span>
                             <ArrowUpRight size={15} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -113,6 +138,8 @@ const Safari = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="styled__button frontend"
+                                onMouseMove={handleButtonMouseMove}
+                                onMouseLeave={handleButtonMouseLeave}
                             >
                                 <Code2 size={14} className="text-white" />
                                 <span>Frontend</span>
@@ -125,6 +152,8 @@ const Safari = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="styled__button backend"
+                                onMouseMove={handleButtonMouseMove}
+                                onMouseLeave={handleButtonMouseLeave}
                             >
                                 <Code2 size={14} className="text-white" />
                                 <span>Backend</span>
