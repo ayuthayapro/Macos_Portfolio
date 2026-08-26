@@ -21,20 +21,93 @@ const ROTATION_LERP = 0.16; // ADJUST HERE: Lower for smoother rotation, higher 
 // Snap-back spring return curves
 const HOVER_RETURN_TRANSITION =
     "transform 0.3s ease-out, box-shadow 0.3s ease-out";
-const SPRING_TRANSITION =
-    "transform 0.55s cubic-bezier(0.25, 1.25, 0.5, 1), box-shadow 0.55s ease-out"; // ADJUST HERE: Spring physics curve
+
+// ADJUST HERE: THE BOUNCE (the spring-back after you let go of a drag)
+//
+// Do NOT put a cubic-bezier overshoot back here. A cubic-bezier can only ever
+// overshoot ONCE, and buying that overshoot means pushing its second control
+// point past y = 1, which bends the curve so hard the turnaround reads as a
+// flick rather than a settle. A real spring overshoots a little and then rings
+// down. `linear()` is a piecewise-linear easing, so sampling a damped harmonic
+// oscillator into it gives a true spring with no animation library.
+const SPRING_DURATION = 0.7; // seconds
+const SPRING_DAMPING_RATIO = 0.55; // < 1 bounces; lower = bouncier, 1 = no overshoot at all
+const SPRING_SETTLE = 6.5; // e^-6.5, so ~0.15% of the throw is left at the end
+const SPRING_SAMPLES = 64; // stops in the linear() curve; 64 lands them ~11ms apart
+
+// Unit step response of a damped spring, sampled into a linear() easing.
+// At 0.62 damping this peaks at 1.083 (an 8.4% overshoot) 38% of the way in and
+// is back within 2% of rest by 58% -- one soft bounce plus a whisper of a
+// second, instead of the old single hard flick.
+const buildSpringEasing = () => {
+    const zeta = SPRING_DAMPING_RATIO;
+    const omega = SPRING_SETTLE / (zeta * SPRING_DURATION);
+    const omegaDamped = omega * Math.sqrt(1 - zeta * zeta);
+    const stops = [];
+    for (let i = 0; i <= SPRING_SAMPLES; i += 1) {
+        const t = (i / SPRING_SAMPLES) * SPRING_DURATION;
+        const ring =
+            Math.cos(omegaDamped * t) +
+            ((zeta * omega) / omegaDamped) * Math.sin(omegaDamped * t);
+        stops.push(Number((1 - Math.exp(-zeta * omega * t) * ring).toFixed(4)));
+    }
+    // Pin the ends. The sampled curve lands on 0.99944, and an easing that does
+    // not finish at exactly 1 leaves the card a hair off its rest position.
+    stops[0] = 0;
+    stops[stops.length - 1] = 1;
+    return `linear(${stops.join(", ")})`;
+};
+
+// `linear()` needs Chromium 113+ / Safari 17.2+ / Firefox 112+. If it were
+// missing, the whole `transition` shorthand would be invalid and the card would
+// snap home with no animation at all, so fall back to a gentle single overshoot
+// rather than trusting it blind.
+const SPRING_EASING = (() => {
+    const easing = buildSpringEasing();
+    const supported =
+        typeof CSS !== "undefined" &&
+        typeof CSS.supports === "function" &&
+        CSS.supports("transition-timing-function", easing);
+    return supported ? easing : "cubic-bezier(0.22, 1.15, 0.36, 1)";
+})();
+
+// transform and box-shadow share ONE curve on purpose. They used to run on
+// different ones (spring vs plain ease-out), so the shadow finished settling
+// while the card was still swinging back and visibly came unstuck from it.
+const SPRING_TRANSITION = `transform ${SPRING_DURATION}s ${SPRING_EASING}, box-shadow ${SPRING_DURATION}s ${SPRING_EASING}`;
+
+// Backstop for a transitionend that never arrives (interrupted drag, tab
+// switch). Must outlast the transition, hence the +100ms.
+const SPRING_TIMEOUT_MS = Math.round(SPRING_DURATION * 1000) + 100;
+
+// The resting shadow from index.css, padded with a second, fully transparent
+// layer. The drag writes a TWO-layer box-shadow, so releasing straight back to
+// the one-layer CSS value made box-shadow interpolate between mismatched lists:
+// layer 2 fell away to nothing while layer 1 jumped 0.24 -> 0.4 alpha and 42px
+// -> 40px blur, and the shadow popped darker partway through the bounce. Two
+// layers in, two layers out. The transparent one paints nothing, so the resting
+// card looks exactly as it did.
+// KEEP LAYER 1 BYTE-IDENTICAL TO `.tilt-card`'s box-shadow in index.css.
+const SPRING_REST_SHADOW =
+    "0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 rgba(0, 0, 0, 0)";
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const lerp = (start, end, amount) => start + (end - start) * amount;
 const dampEdge = (value) => value / (1 + EDGE_DAMPING * Math.abs(value));
 
-const TiltCard = ({ media, children }) => {
+const TiltCard = ({ media, children, contact, zIndex, onPress }) => {
     const cardRef = useRef(null);
     const interactionRef = useRef(null);
     const glossRef = useRef(null);
     const boundsRef = useRef(null);
     const animationFrameRef = useRef(null);
     const snapTimerRef = useRef(null);
+    // Kept in a ref so the pointerdown effect below never has to re-subscribe
+    // just because the parent re-rendered with a fresh inline callback.
+    const onPressRef = useRef(onPress);
+    useEffect(() => {
+        onPressRef.current = onPress;
+    }, [onPress]);
     const dragRef = useRef({
         isDragging: false,
         isSnapping: false,
@@ -160,6 +233,15 @@ const TiltCard = ({ media, children }) => {
             dragRef.current.isSnapping = false;
             delete card.dataset.releasing;
 
+            // Hand the shadow back to index.css now that the bounce is over.
+            // Both writes land in the same task on purpose: clearing the inline
+            // transition alongside the shadow means dropping the padded
+            // transparent layer cannot kick off a second, pointless box-shadow
+            // transition. The two values are identical at this point, so there
+            // is nothing to see.
+            card.style.transition = "";
+            card.style.boxShadow = "";
+
             if (snapTimerRef.current) {
                 clearTimeout(snapTimerRef.current);
                 snapTimerRef.current = null;
@@ -209,13 +291,15 @@ const TiltCard = ({ media, children }) => {
                 : HOVER_RETURN_TRANSITION;
             card.style.transform =
                 "perspective(1000px) translate3d(0px, 0px, 0px) rotateX(0deg) rotateY(0deg)";
-            card.style.boxShadow = "";
+            // Two-layer value on release so box-shadow has a matching list to
+            // interpolate towards; see SPRING_REST_SHADOW.
+            card.style.boxShadow = useSpring ? SPRING_REST_SHADOW : "";
 
             gloss.style.opacity = "0";
             gloss.style.background = "";
 
             if (useSpring) {
-                snapTimerRef.current = setTimeout(finishSnap, 650);
+                snapTimerRef.current = setTimeout(finishSnap, SPRING_TIMEOUT_MS);
             }
         };
 
@@ -259,6 +343,30 @@ const TiltCard = ({ media, children }) => {
         const handlePointerDown = (event) => {
             if (event.pointerType === "mouse" && event.button !== 0) return;
             if (event.isPrimary === false) return;
+
+            // Raise this window above the others first. Runs for link presses
+            // too, before the early return below.
+            onPressRef.current?.();
+
+            // Let interactive children (the contact links) receive the click.
+            // THIS MUST STAY ABOVE `event.preventDefault()`. preventDefault on
+            // pointerdown suppresses the compatibility mouse events, so the
+            // pointerdown -> mousedown -> click sequence dies and `target=_blank`
+            // / mailto: / tel: never fire. Bailing first keeps it intact.
+            //
+            // Do NOT try to solve this with a React-level stopPropagation
+            // instead: this is a *native* pointerdown listener on
+            // `.tilt-card-interaction-area`, while React 19 delegates
+            // onPointerDown to the #root container -- an ancestor -- so the
+            // native listener always runs first and React's stopPropagation
+            // would be too late.
+            const target = event.target;
+            if (
+                target instanceof Element &&
+                target.closest("a, button, input, textarea, select")
+            ) {
+                return;
+            }
 
             event.preventDefault();
 
@@ -388,7 +496,10 @@ const TiltCard = ({ media, children }) => {
     }, [updateBounds]);
 
     return (
-        <div className="tilt-card-wrapper">
+        <div
+            className="tilt-card-wrapper"
+            style={zIndex === undefined ? undefined : { zIndex }}
+        >
             <div ref={interactionRef} className="tilt-card-interaction-area">
                 <article ref={cardRef} className="tilt-card">
                     <div
@@ -397,13 +508,28 @@ const TiltCard = ({ media, children }) => {
                         aria-hidden="true"
                     />
 
-                    <div className="card-media">
-                        {media}
+                    <div className="card-clip">
+                        <div className="card-media">
+                            {media}
+                        </div>
                     </div>
 
                     <div className="card-content">
                         {children}
                     </div>
+
+                    {/* `contact` is a slot, NOT part of `children`, and that is
+                        deliberate. Anything inside .card-content inherits its
+                        `translateZ(25px)`, and clickable things should not live
+                        at depth here: Chromium's hit region for a lifted child
+                        of a rotated, perspective-projected parent drifts away
+                        from where that child is painted, and the drift grows
+                        with the tilt angle. Rendering the contact block as a
+                        SIBLING of .card-content keeps it at z = 0, coplanar with
+                        the card face, which is the case browsers hit-test
+                        exactly. index.css positions it with plain bottom/right
+                        so it lands in the same spot as before. */}
+                    {contact}
                 </article>
             </div>
         </div>
