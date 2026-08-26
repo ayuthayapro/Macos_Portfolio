@@ -6,7 +6,7 @@
 html,
 body {
     width: 100dvw;
-
+    overflow: hidden;
     height: 100dvh;
     background-image: url("/public/images/Mountain.png");
     background-size: cover;
@@ -478,22 +478,22 @@ body {
         border: 1px solid rgba(0, 0, 0, 0.08);
         border-radius: 20px;
         box-sizing: border-box;
-        overflow: visible;
+
         touch-action: none;
         transform-style: preserve-3d;
+
+        /* One clean dark drop-shadow. This is also exactly the value the spring
+           in TiltCard.jsx rests at (shadowX 0, shadowY 20), so the inline shadow
+           framer-motion writes on mount is seamless with this one -- no light
+           first-paint shadow before hydration. */
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         outline: none;
-        will-change: transform;
-    }
 
-    /* Clips ONLY the phone media to the card's 20px rounded corner boundary */
-    .card-clip {
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        overflow: hidden;
-        pointer-events: none;
-        transform-style: preserve-3d;
+        /* `backface-visibility: hidden` was removed: MAX_TILT is 15deg so the
+           card never shows its back, and forcing a composited layer on a
+           rounded, rotated element is what produces the pale 1px rim. Only
+           `transform` is worth hinting -- box-shadow is not compositable. */
+        will-change: transform;
     }
 
     .tilt-card.is-interacting,
@@ -503,6 +503,19 @@ body {
     .tilt-card[data-dragging="true"] * {
         transition: none !important;
     }
+
+    /* THE WHITE HALO LIVED HERE.
+       This layer is filled with a white radial-gradient and it used to carry
+       `transform: translateZ(40px)`. Inside the wrapper's `perspective: 1000px`
+       a layer at +40px is scaled by 1000 / (1000 - 40) = 1.0417, so a 540x320
+       gloss rendered at 562x333 -- about 11px of white sticking out on each side
+       and 7px top and bottom, drifting to one side as the card tilts. That is
+       the halo. `will-change` and `backface-visibility` made it worse by
+       promoting the gloss to its own composited layer, where the parent's
+       rounded `overflow: hidden` clip is applied approximately and fringes.
+       Fixes: no translateZ (no upscale), no layer promotion, and inset 1px
+       inside the card's 1px border with a matching 19px radius so even a
+       subpixel mismatch stays inside the card. */
 
     .tilt-card-gloss {
         position: absolute;
@@ -592,49 +605,16 @@ body {
         line-height: 1.45;
     }
     /* contact in card */
-    /* NOTE: this block is now a SIBLING of .card-content, not a child of it --
-       see the `contact` slot in TiltCard.jsx. It therefore positions against
-       .tilt-card's padding box, so the `bottom`/`right` below simply reproduce
-       the bottom and right components of .card-content's
-       `inset: 38px 40px 24px 46px`. That is why they are 24px and 40px: same
-       painted position as before, no visual change from the move.
-
-       WHY IT LEFT .card-content: to get the links out of a Z-lifted subtree.
-       Inside .card-content they inherited its `translateZ(25px)` and added
-       `translateZ(20px)` of their own. Whenever .tilt-card is a real preserve-3d
-       context that puts them 45px in front of the card face, and Chromium's hit
-       region for a Z-lifted child of a rotated, perspective-projected parent does
-       not follow its paint -- the error grows with the tilt angle, so the links
-       go dead as soon as the card moves. At z = 0 they are coplanar with the card
-       face, which is the case that hit-tests exactly.
-
-       CAVEAT, true of this file as it stands: .tilt-card declares
-       `overflow: hidden` (for the phone crop), and any `overflow` other than
-       visible forces the used value of `transform-style` to `flat`. So the card
-       is ONE 2D PLANE right now and every `translateZ` inside it is already
-       inert -- .card-content's 25px, .card-media's 15px, and the 20px this rule
-       used to carry. Hence no `scale()` compensation here: there is no
-       perspective magnification to hand back. If .tilt-card ever returns to
-       `overflow: visible`, .card-content's 25px wakes up and the heading/copy
-       grow ~5%, but THIS block stays flat and unscaled -- which is the point.
-
-       DO NOT try to "fix" clicking with translateZ here. Two depth-based
-       attempts already failed: a -24.9px counter-lift (strictly worse -- the
-       links became completely unclickable) and a .card-surface clip layer. */
     .card-contact-info {
         position: absolute;
-        bottom: 24px;      /* ⬅️ Adjust vertical position (increase to move higher) */
-        right: 40px;       /* ⬅️ Adjust horizontal position (increase to move further left) */
+        bottom: 0px;       /* ⬅️ Adjust vertical position (increase to move higher) */
+        right: 0px;        /* ⬅️ Adjust horizontal position (increase to move further left) */
         display: flex;
         flex-direction: column;
         align-items: flex-end; /* Aligns text lines to the right */
         gap: 2px;
-        /* Was 10, which only ever applied inside .card-content's own stacking
-           context (created by its transform), so the gloss at z-index 3 still
-           painted over the links. As a sibling this now competes with
-           .tilt-card-gloss directly and 10 would put the links ON TOP of the
-           sheen. 2 keeps them under the gloss and above .card-media (1). */
-        z-index: 2;
+        z-index: 10;
+        transform: translateZ(20px);
         pointer-events: auto !important;
     }
 
