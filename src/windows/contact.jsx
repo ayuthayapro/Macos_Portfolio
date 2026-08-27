@@ -28,22 +28,43 @@ const Contact = () => {
        The card's drag listener is a *native* pointerdown listener on
        .tilt-card-interaction-area. React 19 delegates onPointerDown to the #root
        container, which is an ancestor of that element, so a React-level
-       event.stopPropagation() here would run too late to stop it. What protects
-       these links is the `closest("a, button, input, textarea, select")` early
-       return in TiltCard.handlePointerDown -- it bails before preventDefault(),
-       which keeps the pointerdown -> mousedown -> click sequence (and therefore
-       target="_blank") intact. */
+       event.stopPropagation() here would run too late to stop it. What actually
+       protects these links is the `closest("a, button, input, textarea, select")`
+       early return in TiltCard.handlePointerDown -- it bails before
+       preventDefault(), which keeps the pointerdown -> mousedown -> click
+       sequence (and therefore target="_blank") intact.
+
+       `stopLinkEvent` below is defensive belt-and-suspenders: it stops the React
+       synthetic pointerdown/click from bubbling to any React-level handler an
+       ancestor window shell might add later (none today). It deliberately does
+       NOT call preventDefault, so native anchor navigation still fires. */
+    const stopLinkEvent = (event) => event.stopPropagation();
+
     const contactLinks = (
         <div className="card-contact-info">
             <a
                 href="https://github.com/ayuthayapro"
                 target="_blank"
                 rel="noopener noreferrer"
+                onPointerDown={stopLinkEvent}
+                onClick={stopLinkEvent}
             >
                 GitHub
             </a>
-            <a href="mailto:boayutia@gmail.com">boayutia@gmail.com</a>
-            <a href="tel:+88581661190">+885 81 661 190</a>
+            <a
+                href="mailto:ayutiatabb@gmail.com"
+                onPointerDown={stopLinkEvent}
+                onClick={stopLinkEvent}
+            >
+                ayutiatabb@gmail.com
+            </a>
+            <a
+                href="tel:+88581661190"
+                onPointerDown={stopLinkEvent}
+                onClick={stopLinkEvent}
+            >
+                +885 81 661 190
+            </a>
         </div>
     );
 

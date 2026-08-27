@@ -303,9 +303,38 @@ const TiltCard = ({ media, children, contact, zIndex, onPress }) => {
             }
         };
 
+        const getIntersectingLink = (clientX, clientY) => {
+            if (!card) return null;
+            const links = card.querySelectorAll(".card-contact-info a, a, button");
+            for (const link of links) {
+                const rect = link.getBoundingClientRect();
+                if (
+                    clientX >= rect.left - 4 &&
+                    clientX <= rect.right + 4 &&
+                    clientY >= rect.top - 4 &&
+                    clientY <= rect.bottom + 4
+                ) {
+                    return link;
+                }
+            }
+            return null;
+        };
+
         const handleMouseMove = (event) => {
             const drag = dragRef.current;
             if (drag.isDragging || drag.isSnapping) return;
+
+            const hoveredLink = getIntersectingLink(event.clientX, event.clientY);
+            interactionArea.style.cursor = hoveredLink ? "pointer" : "grab";
+
+            const allLinks = card.querySelectorAll(".card-contact-info a");
+            allLinks.forEach((l) => {
+                if (l === hoveredLink) {
+                    l.classList.add("is-hovered");
+                } else {
+                    l.classList.remove("is-hovered");
+                }
+            });
 
             const bounds = boundsRef.current;
             if (!bounds) return;
@@ -326,6 +355,9 @@ const TiltCard = ({ media, children, contact, zIndex, onPress }) => {
         };
 
         const handleMouseLeave = () => {
+            const allLinks = card.querySelectorAll(".card-contact-info a");
+            allLinks.forEach((l) => l.classList.remove("is-hovered"));
+            interactionArea.style.cursor = "grab";
             const drag = dragRef.current;
             if (!drag.isDragging && !drag.isSnapping) {
                 resetCard();
@@ -348,23 +380,13 @@ const TiltCard = ({ media, children, contact, zIndex, onPress }) => {
             // too, before the early return below.
             onPressRef.current?.();
 
-            // Let interactive children (the contact links) receive the click.
-            // THIS MUST STAY ABOVE `event.preventDefault()`. preventDefault on
-            // pointerdown suppresses the compatibility mouse events, so the
-            // pointerdown -> mousedown -> click sequence dies and `target=_blank`
-            // / mailto: / tel: never fire. Bailing first keeps it intact.
-            //
-            // Do NOT try to solve this with a React-level stopPropagation
-            // instead: this is a *native* pointerdown listener on
-            // `.tilt-card-interaction-area`, while React 19 delegates
-            // onPointerDown to the #root container -- an ancestor -- so the
-            // native listener always runs first and React's stopPropagation
-            // would be too late.
-            const target = event.target;
-            if (
-                target instanceof Element &&
-                target.closest("a, button, input, textarea, select")
-            ) {
+            // Check direct target as well as geometric hit-box:
+            const clickedLink =
+                (event.target instanceof Element &&
+                    event.target.closest("a, button, input, textarea, select")) ||
+                getIntersectingLink(event.clientX, event.clientY);
+
+            if (clickedLink) {
                 return;
             }
 
@@ -408,6 +430,21 @@ const TiltCard = ({ media, children, contact, zIndex, onPress }) => {
             card.dataset.dragging = "true";
             interactionArea.dataset.dragging = "true";
             card.style.transition = "none";
+        };
+
+        const handleClick = (event) => {
+            const clickedLink = getIntersectingLink(event.clientX, event.clientY);
+            if (clickedLink && clickedLink instanceof HTMLAnchorElement) {
+                const href = clickedLink.getAttribute("href");
+                const target = clickedLink.getAttribute("target");
+                if (href) {
+                    if (target === "_blank") {
+                        window.open(href, "_blank", "noopener,noreferrer");
+                    } else {
+                        window.location.href = href;
+                    }
+                }
+            }
         };
 
         const handlePointerMove = (event) => {
@@ -466,6 +503,7 @@ const TiltCard = ({ media, children, contact, zIndex, onPress }) => {
         interactionArea.addEventListener("pointerdown", handlePointerDown, {
             passive: false,
         });
+        interactionArea.addEventListener("click", handleClick);
         interactionArea.addEventListener("dragstart", preventNativeDrag);
         card.addEventListener("transitionend", handleSnapTransitionEnd);
         window.addEventListener("pointermove", handlePointerMove);
@@ -486,6 +524,7 @@ const TiltCard = ({ media, children, contact, zIndex, onPress }) => {
             interactionArea.removeEventListener("mousemove", handleMouseMove);
             interactionArea.removeEventListener("mouseleave", handleMouseLeave);
             interactionArea.removeEventListener("pointerdown", handlePointerDown);
+            interactionArea.removeEventListener("click", handleClick);
             interactionArea.removeEventListener("dragstart", preventNativeDrag);
             card.removeEventListener("transitionend", handleSnapTransitionEnd);
             window.removeEventListener("pointermove", handlePointerMove);

@@ -516,6 +516,7 @@ body {
         -webkit-backface-visibility: hidden;
         transition: opacity 0.2s ease-out;
         will-change: opacity, background;
+        pointer-events: none !important;
     }
 
     .card-media {
@@ -629,12 +630,12 @@ body {
         flex-direction: column;
         align-items: flex-end; /* Aligns text lines to the right */
         gap: 2px;
-        /* Was 10, which only ever applied inside .card-content's own stacking
-           context (created by its transform), so the gloss at z-index 3 still
-           painted over the links. As a sibling this now competes with
-           .tilt-card-gloss directly and 10 would put the links ON TOP of the
-           sheen. 2 keeps them under the gloss and above .card-media (1). */
-        z-index: 2;
+        z-index: 10 !important;
+        pointer-events: auto !important;
+    }
+
+    .tilt-card .card-contact-info,
+    .tilt-card .card-contact-info * {
         pointer-events: auto !important;
     }
 
@@ -648,6 +649,8 @@ body {
     .tilt-card .card-contact-info a,
     .tilt-card .card-contact-info a:link,
     .tilt-card .card-contact-info a:visited {
+        position: relative;
+        z-index: 10 !important;
         pointer-events: auto !important;
         cursor: pointer !important;
         color: #52525b !important;
@@ -659,6 +662,7 @@ body {
     }
 
     .tilt-card .card-contact-info a:hover,
+    .tilt-card .card-contact-info a.is-hovered,
     .tilt-card .card-contact-info a:focus,
     .tilt-card .card-contact-info a:focus-visible,
     .tilt-card .card-contact-info a:active,
@@ -666,6 +670,9 @@ body {
     .tilt-card .card-contact-info a:visited:hover,
     .tilt-card .card-contact-info a:link:focus,
     .tilt-card .card-contact-info a:visited:focus {
+        /* Restated on hover so it cannot be lost if the base rule is ever
+           reordered; `body.is-dragging` still overrides this to `grabbing`. */
+        cursor: pointer !important;
         color: #007aff !important;
         -webkit-text-fill-color: #007aff !important;
         font-weight: 500;
