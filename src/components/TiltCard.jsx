@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import gsap from "gsap";
 
 // ============================================================================
 // ADJUST HERE: CONFIGURATION CONSTANTS
@@ -95,7 +96,7 @@ const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const lerp = (start, end, amount) => start + (end - start) * amount;
 const dampEdge = (value) => value / (1 + EDGE_DAMPING * Math.abs(value));
 
-const TiltCard = ({ media, children, contact, zIndex, onPress }) => {
+const TiltCard = ({ media, children, avatar, contact, zIndex, onPress }) => {
     const cardRef = useRef(null);
     const interactionRef = useRef(null);
     const glossRef = useRef(null);
@@ -142,6 +143,76 @@ const TiltCard = ({ media, children, contact, zIndex, onPress }) => {
         const interactionArea = interactionRef.current;
         const gloss = glossRef.current;
         if (!card || !interactionArea || !gloss) return;
+
+        // [OPTION 1: macOS Pop & 3D Settle]
+        gsap.fromTo(
+            interactionArea,
+            {
+                scale: 0.65,
+                opacity: 0,
+                y: 35,
+                rotateX: -12,
+            },
+            {
+                scale: 1,
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
+                duration: 0.55,
+                ease: "back.out(1.4)",
+                clearProps: "scale,opacity,y,rotateX",
+                onComplete: () => {
+                    updateBounds();
+                },
+            }
+        );
+
+        /*
+        // [OPTION: Scale-Up & Fade Animation]
+        gsap.fromTo(
+            interactionArea,
+            {
+                scale: 0.85,
+                opacity: 0,
+            },
+            {
+                scale: 1,
+                opacity: 1,
+                duration: 0.4,
+                ease: "power3.out",
+                clearProps: "scale,opacity",
+                onComplete: () => {
+                    updateBounds();
+                },
+            }
+        );
+        */
+
+        // Soft initial gloss light sweep across card upon landing
+        gsap.fromTo(
+            gloss,
+            {
+                opacity: 0,
+                background:
+                    "radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.45), transparent 50%)",
+            },
+            {
+                opacity: 0.85,
+                background:
+                    "radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.45), transparent 50%)",
+                duration: 0.7,
+                delay: 0.15,
+                ease: "power2.out",
+                onComplete: () => {
+                    gsap.to(gloss, {
+                        opacity: 0,
+                        duration: 0.35,
+                        clearProps: "background",
+                    });
+                },
+            }
+        );
+
 
         const cancelRenderFrame = () => {
             if (animationFrameRef.current) {
@@ -556,6 +627,8 @@ const TiltCard = ({ media, children, contact, zIndex, onPress }) => {
                     <div className="card-content">
                         {children}
                     </div>
+
+                    {avatar}
 
                     {/* `contact` is a slot, NOT part of `children`, and that is
                         deliberate. Anything inside .card-content inherits its
