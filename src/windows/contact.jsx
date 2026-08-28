@@ -68,9 +68,22 @@ const Contact = () => {
         </div>
     );
 
+    const avatarElement = (
+        <div className="card-avatar-wrapper">
+            <img
+                src="/images/profile.jpg"
+                alt="Profile"
+                className="card-avatar-img"
+                draggable="false"
+            />
+            <span className="card-avatar-status" />
+        </div>
+    );
+
     return (
         <TiltCard
             media={phoneImage}
+            avatar={avatarElement}
             contact={contactLinks}
             zIndex={zIndex}
             onPress={() => focusWindow("contact")}
