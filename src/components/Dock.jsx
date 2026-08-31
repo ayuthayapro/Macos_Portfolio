@@ -82,17 +82,18 @@ const Dock = () => {
         <section id="dock">
             <div ref={dockRef} className="dock-container">
                 {dockApps.map(({id, name, icon, canOpen}) => (
-                    <div key={id} className = "relative flex justify-center">
+                    <div key={id} className = "relative flex items-center justify-center">
+                        {id === "trash" && <div className="dock-divider" />}
                         <button
                             type="button"
                             className="dock-icon"
+                            data-app={id}
                             aria-label={name}
                             data-tooltip-id="dock-tooltip"
                             data-tooltip-content={name}
                             data-tooltip-delay-show={100}
                             disabled={!canOpen}
                             onClick={() => toggleApp({ id, canOpen})}
-
                         >
                             <img
                                 src={`/images/${icon}`}
@@ -105,7 +106,6 @@ const Dock = () => {
                 ))}
                 <Tooltip id="dock-tooltip" place="top" className="tooltip"/>
             </div>
-
         </section>
     );
 };

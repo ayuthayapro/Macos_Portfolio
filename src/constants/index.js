@@ -22,7 +22,7 @@ const navLinks = [
     {
         id: 1,
         name: "Projects",
-        type: "finder",
+        type: "safari",
     },
     {
         id: 3,
@@ -90,7 +90,7 @@ const dockApps = [
         id: "trash",
         name: "Archive", // was "Trash"
         icon: "trash.png",
-        canOpen: false,
+        canOpen: true,
     },
 ];
 
@@ -522,7 +522,7 @@ const WINDOW_CONFIG = {
     terminal: { isOpen: false, zIndex: INITIAL_Z_INDEX, data: null },
     txtfile: { isOpen: false, zIndex: INITIAL_Z_INDEX, data: null },
     imgfile: { isOpen: false, zIndex: INITIAL_Z_INDEX, data: null },
-
+    trash: { isOpen: false, zIndex: INITIAL_Z_INDEX, data: null },
 };
 
 export { INITIAL_Z_INDEX, WINDOW_CONFIG };

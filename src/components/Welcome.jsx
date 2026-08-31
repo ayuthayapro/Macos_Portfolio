@@ -80,7 +80,7 @@ const Welcome = () => {
                 "text-3xl font-mona sans",
                 100,
             )}
-                </p>
+        </p>
         <h1 ref={titleRef} className="mt-5">
             {renderText("portfolio.", 'text-9xl italic font-bitcount')}
         </h1>
