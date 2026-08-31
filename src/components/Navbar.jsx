@@ -23,7 +23,11 @@ const Navbar = () => {
 
                 <ul>
                     {navLinks.map(({ id, name, type }) => (
-                        <li key={id} onClick={() => handleNavClick(type)}>
+                        <li
+                            key={id}
+                            onClick={() => handleNavClick(type)}
+                            className="cursor-pointer select-none"
+                        >
                             <p>{name}</p>
                         </li>
                     ))}

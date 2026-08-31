@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Georama:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Rubik+Pixels&family=Sixtyfour+Convergence&display&family=Jersey+10+Charted&display&family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght@100..900&display&family=Pixelify+Sans:wght@400..700&display&family=Sekuya&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght@100..900&display&family=Pixelify+Sans:wght@400..700&display&family=Sekuya&display=swap&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display&family=Instrument+Serif:ital@0;1&display=swap");
 
 @import "tailwindcss";
 
@@ -25,6 +25,8 @@ body {
     --font-jersey: "Jersey 10 Charted", sans-serif;
     --font-pixel: "Pixelify Sans", sans-serif;
     --font-mona: "Mona Sans", sans-serif;
+    --font-inter: "Inter", sans-serif;
+    --font-instrument: "Instrument Serif", serif;
 }
 
 @utility flex-center {
@@ -135,10 +137,35 @@ body {
     }
 
     #dock {
-        @apply absolute bottom-5 left-1/2 -translate-x-1/2 z-50 select-none max-sm:hidden;
+        @apply absolute bottom-1 left-1/2 -translate-x-1/2 z-50 select-none max-sm:hidden;
 
         .dock-container {
-            @apply bg-white/20 backdrop-blur-md justify-between rounded-2xl p-1.5 flex items-end gap-1.5;
+            width: fit-content;
+            box-sizing: border-box;
+            background: rgba(246, 246, 246, 0.36);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 28px;
+            border: 1px solid rgba(246, 246, 246, 0.20);
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            overflow: visible;
+            transition: width 0.3s ease;
+        }
+
+        .dock-divider {
+            width: 1px;
+            height: 62px;
+            background: rgba(0, 0, 0, 0.35);
+            margin-right: 14px;
+            margin-left: 2px;
+            flex-shrink: 0;
+            pointer-events: none;
+            align-self: center;
         }
 
         .tooltip {
@@ -150,6 +177,16 @@ body {
 
             img {
                 @apply object-cover object-center;
+            }
+
+            /* Adjust Terminal Icon Position & Size */
+            &[data-app="terminal"] img {
+                transform: scale(1.05) translateY(0.9px); /* ⬅️ Line 158: Moves up slightly */
+            }
+
+            /* Adjust Trash Icon Size to match dock height */
+            &[data-app="trash"] img {
+                transform: scale(1.1) translateY(-1px); /* ⬅️ Line 163: Balanced visual height with dock */
             }
         }
     }
@@ -311,7 +348,7 @@ body {
     }
 
     #terminal {
-        @apply w-xl absolute top-32 left-1/12 bg-white shadow-2xl drop-shadow-2xl rounded-xl overflow-hidden;
+        @apply w-xl absolute top-40 left-2/12 bg-white shadow-2xl drop-shadow-2xl rounded-xl overflow-hidden;
 
         h2 {
             @apply font-bold text-sm text-center w-full;
