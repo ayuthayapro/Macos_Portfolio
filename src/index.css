@@ -6,12 +6,9 @@
 html,
 body {
     width: 100dvw;
-
     height: 100dvh;
-    background-image: url("/public/images/Mountain.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+    background-color: #0061c9;
+    overflow: hidden;
 }
 
 @theme {
