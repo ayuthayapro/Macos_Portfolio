@@ -475,7 +475,11 @@ const WaveBackground = ({ config = WAVE_CONFIG }) => {
             ref={canvasRef}
             aria-hidden="true"
             className="fixed inset-0 w-full h-full pointer-events-none z-0 select-none block"
-            style={{ width: "100vw", height: "100vh" }}
+            style={{
+                width: "100vw",
+                height: "100vh",
+                background: "linear-gradient(150deg, rgb(120, 177, 194) 0%, rgb(0, 97, 201) 45%, rgb(10, 130, 255) 100%)",
+            }}
         />
     );
 };

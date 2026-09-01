@@ -38,6 +38,8 @@ const WindowWrapper = (Component, windowKey) => {
 
             const [instance] = Draggable.create(el, {
                 trigger: header || el,
+                type: "x,y",
+                force3D: true,
                 onPress: () => focusWindow(windowKey),
             });
             return () => instance.kill();
