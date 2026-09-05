@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 
 import { navLinks, navIcons } from "#constants";
@@ -5,6 +6,16 @@ import useWindowStore from "#store/window.js";
 
 const Navbar = () => {
     const { openWindow, closeWindow, windows } = useWindowStore();
+    const [currentTime, setCurrentTime] = useState(dayjs());
+
+    useEffect(() => {
+        // Ticks every second so the clock updates live without needing a page refresh
+        const timer = setInterval(() => {
+            setCurrentTime(dayjs());
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
 
     const handleNavClick = (type) => {
         if (!type) return;
@@ -16,10 +27,12 @@ const Navbar = () => {
     };
 
     return (
-        <nav>
+        <nav className="text-white">
             <div>
                 <img src="/images/logo.svg" alt="logo" />
-                <p className="font-bold">Ayuthaya Portfolio</p>
+                <p className="brand-title text-white">
+                    <span className="font-bold">Ayuthaya  portfolio </span>
+                </p>
 
                 <ul>
                     {navLinks.map(({ id, name, type }) => (
@@ -28,7 +41,7 @@ const Navbar = () => {
                             onClick={() => handleNavClick(type)}
                             className="cursor-pointer select-none"
                         >
-                            <p>{name}</p>
+                            <p className="text-white">{name}</p>
                         </li>
                     ))}
                 </ul>
@@ -42,7 +55,7 @@ const Navbar = () => {
                         </li>
                     ))}
                 </ul>
-                <time>{dayjs().format("ddd MMM D h:mm A")}</time>
+                <time className="text-white">{currentTime.format("ddd MMM D h:mm A")}</time>
             </div>
         </nav>
     );
