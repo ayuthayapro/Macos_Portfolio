@@ -4,68 +4,28 @@ import {
     ArrowUpRight,
     Code2,
     ChevronDown,
-    Home,
-    Bot,
-    Smartphone,
-    Video,
-    Globe,
-    UserCircle,
-    Sparkles,
-    FolderDown,
-    Trash2,
-    FileText,
     GraduationCap,
+    Palette,
+    Clock,
 } from "lucide-react";
 import WindowWrapper from "#hoc/WindowWrapper.jsx";
 import { projectArticles } from "#constants/index.js";
 
 const ICON_MAP = {
     elearning: GraduationCap,
-    archline: Home,
-    nexmind: Bot,
-    dewi: Smartphone,
-    creatory: Video,
-    brnd: Globe,
-    nonsence: UserCircle,
-    glaze: Sparkles,
+    "thumbnail-design": Palette,
 };
 
 const GENERAL_SECTIONS = [
     {
-        id: "resources",
-        name: "Resources",
-        icon: FolderDown,
-        client: "Curated Tools",
-        year: "2025",
-        category: "/ Design Systems / Development Toolkits",
+        id: "coming-soon",
+        name: "Coming Soon",
+        icon: Clock,
+        client: "In Development",
+        category: "/ Future Releases & Case Studies",
         description:
-            "A collection of curated design systems, UI kits, open-source repositories, and developer toolkits used to build high-performance web applications and fluid interactive animations.",
-        preview: "https://framerusercontent.com/images/BioZIG0GuLlZAIoshbFOCdctS7I.png?scale-down-to=1024",
-        url: "https://github.com/ayuthayapro",
-    },
-    {
-        id: "archive",
-        name: "Archive",
-        icon: Trash2,
-        client: "Legacy Portfolio",
-        year: "2022 — 2024",
-        category: "/ Experiments / Prototypes / Open Source",
-        description:
-            "An archive of early coding experiments, creative WebGL shaders, Three.js 3D prototypes, and foundational projects developed throughout university studies.",
-        preview: "https://framerusercontent.com/images/MZaxJjFtRo4mSnx24EjY6XllOg.png?scale-down-to=1024",
-        url: "https://github.com/ayuthayapro",
-    },
-    {
-        id: "privacy",
-        name: "Privacy Policy",
-        icon: FileText,
-        client: "Ayuthaya Portfolio",
-        year: "2026",
-        category: "/ Legal / Website Terms",
-        description:
-            "This portfolio is a personal developer showcase designed to emulate macOS Monterey. No personal tracking cookies or behavioral advertising trackers are utilized. All assets belong to their respective creators.",
-        preview: "https://framerusercontent.com/images/EpE3EXTbHQgZGhvDOnYoCiOPO4Q.jpg?scale-down-to=1024",
-        url: "#",
+            "New projects, creative resources, and design case studies are currently in development. Stay tuned for upcoming updates!",
+        preview: "/images/plain.png",
     },
 ];
 
@@ -238,24 +198,26 @@ const Safari = () => {
                     </div>
 
                     {/* Preview Section */}
-                    <div className="disclosure-section preview-section">
-                        <div className="disclosure-heading">
-                            <ChevronDown size={13} className="text-gray-400" />
-                            <span>Preview:</span>
-                        </div>
+                    {activeItem.id !== "coming-soon" && previewImages.length > 0 && (
+                        <div className="disclosure-section preview-section">
+                            <div className="disclosure-heading">
+                                <ChevronDown size={13} className="text-gray-400" />
+                                <span>Preview:</span>
+                            </div>
 
-                        <div className="preview-container">
-                            {previewImages.map((imgSrc, index) => (
-                                <div key={index} className="preview-frame">
-                                    <img
-                                        src={imgSrc}
-                                        alt={`${activeItem.title || activeItem.name} preview ${index + 1}`}
-                                        className="preview-image"
-                                    />
-                                </div>
-                            ))}
+                            <div className="preview-container">
+                                {previewImages.map((imgSrc, index) => (
+                                    <div key={index} className="preview-frame">
+                                        <img
+                                            src={imgSrc}
+                                            alt={`${activeItem.title || activeItem.name} preview ${index + 1}`}
+                                            className="preview-image"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Action Buttons (For ELearning or projects with code repositories) */}
                     {(activeItem.sourceFrontend || activeItem.sourceBackend || activeItem.projectLink) && (
